@@ -175,10 +175,10 @@ const gsModule = function(opts) {
             'url': url,
             'viewport': '1336x1400',
             'delay': '5',
-            'location': location.name || 'ca-on-trn',
+            'location': location.name,
             'useragent': 'chrome',
-            'fullpage': 1,
-            'no_images': 1,
+            'fullpage': 0,
+            'no_images': 0,
             'no_cache': 0
         };
         let options = {

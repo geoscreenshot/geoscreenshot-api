@@ -327,7 +327,7 @@ if (CLI) {
             // Capture random 5 locations
             _log("CLI", "Capturing 5 Random locations");
             let filterRandom = function(allLocs) {
-                return Promise.resolve(gs.utils.sample(allLocs))
+                return Promise.resolve(gs.utils.sample(allLocs, 5))
             };
 
             gs.locations().then(filterRandom)

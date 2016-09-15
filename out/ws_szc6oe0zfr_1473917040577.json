@@ -1,0 +1,26 @@
+{
+  "date": 1473917066190,
+  "id": "ws_szc6oe0zfr_1473917040577",
+  "location": {
+    "name": "sg-sng",
+    "city": "Singapore (Downtown Core)",
+    "state": "",
+    "country_code": "SG",
+    "country": "Singapore",
+    "lat": 1.28213,
+    "lon": 103.85,
+    "plan": "plus",
+    "timezone": "Asia/Singapore"
+  },
+  "request": {
+    "url": "http://weather.yahoo.com",
+    "viewport": "1336x1400",
+    "delay": "5",
+    "location": "sg-sng",
+    "useragent": "chrome",
+    "fullpage": 1,
+    "no_images": 1,
+    "no_cache": 0
+  },
+  "size": 147076
+}

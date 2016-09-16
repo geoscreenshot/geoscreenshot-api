@@ -14,6 +14,33 @@ The documentation for the web service can be found here:
 
 ## Examples
 
+
+#### Capture from all locations of a country
+
+```javascript
+"use strict";
+
+const config = {
+    'url': 'http://news.google.com',
+    'imageDir': './out/',
+    'verbose': true
+};
+
+const gs = require('./geoscreenshot')(config);
+
+gs.locations()
+    .then(gs.filter('IN')) // Filter by country code
+    .then(gs.multicapture)
+    .then((results) => {
+        console.log("Captured ", results.length, "locations");
+    }, (error) => {
+        // Handle error
+    });
+    
+
+```
+
+
 #### Capture a single location
 
 In your `.js` file:
@@ -28,38 +55,36 @@ const gs = require('./geoscreenshot')(config);
 gs.gsCapture('http://www.example.com').then((result) => {
     console.log("Retrieved base 64 image of length: ", result.image.length);
 }, (error) => {
-    console.log("There was an error", error);
+    // Handle error
 });
 ```
 
-#### Capture multiple locations
+#### Capture from all available locations
 
 In your `.js` file:
 
 ```javascript
-// Set default URL, defaults to Yahoo Weather and current dir respectively
+"use strict";
+
 const config = {
-'url': 'http://www.example.com',
-'imageDir': './out/'
-};
-const gs = require('geoscreenshot-api')(config);
-console.log("CLI", "Capturing 5 Random locations");
-let filterRandom = function(allLocs) {
-    return Promise.resolve(gs.utils.sample(allLocs))
+    'url': 'http://weather.yahoo.com',
+    'imageDir': './out/',
+    'verbose': true
 };
 
-gs.locations().then(filterRandom)
-    .then(gs.multicapture)
+const gs = require('./geoscreenshot')(config);
+
+gs.locations().then(gs.multicapture)
     .then((results) => {
         console.log("Captured ", results.length, "locations");
     }, (error) => {
-        console.error("There was an error", error);
+        // Handle error
     });
 ```
 
 ### CLI Usage
 
-#### Capture sample single screenshot
+#### Capture single screenshot
 
 ```bash
 node geoscreenshot
@@ -82,6 +107,45 @@ node geoscreenshot random <url>
 ```bash
 node geoscreenshot multi <url>
 ```
+
+### Output 
+
+The script will generate 2 files per capture
+
+`<id>.json`, example:
+
+```
+{
+  "date": 1474044949580,
+  "id": "ws_0a986wrvn29_1474044949443",
+  "location": {
+    "name": "lv-rix-riga",
+    "city": "Riga",
+    "state": "RIX",
+    "country_code": "LV",
+    "country": "Latvia",
+    "lat": 56.95,
+    "lon": 24.1,
+    "plan": "plus",
+    "timezone": "Europe/Riga"
+  },
+  "request": {
+    "url": "http://www.example.com",
+    "viewport": "1336x1400",
+    "delay": "5",
+    "location": "lv-rix-riga",
+    "useragent": "chrome",
+    "fullpage": 0,
+    "no_images": 0,
+    "no_cache": 0
+  },
+  "size": 46284
+}
+
+```
+
+and `<id>.png`
+
 
 ## Getting Started
 
@@ -131,7 +195,7 @@ The RESTful API is documented here:
 
 ## Tips
 
-* Do not exceed 30 screenshots per minute or your IP will be temporarily blocked
+* The public API is rate limited and your IP maybe temporarily blocked if you exceed 30 reqs / minute
 
 
 ## Contributors

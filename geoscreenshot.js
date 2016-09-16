@@ -11,8 +11,8 @@
 // Check if running in CLI mode
 const CLI =  (require.main === module);
 
-// Suppress log messages for non-CLI
-const _log = CLI ? console.log : ()=>{}; 
+// Log suppressed by default
+var _log = () => {};
 
 const request = require("request");
 const async = require("async");
@@ -39,6 +39,7 @@ const PATH_BASE = "/api/ws/";
  * @default 3
  */
 const API_LIMIT = 3;
+
 
 
 /** 
@@ -92,7 +93,7 @@ function utilMetadata(a) {
         size: a.image.length,
         error: a.error
     };
-    return JSON.stringify(obj, null, 2)
+    return JSON.stringify(obj, null, 2);
 }
 
 /**
@@ -107,6 +108,10 @@ function utilMetadata(a) {
 const gsModule = function(opts) {
 
     opts = opts || {};
+    
+    // Suppress log messages for non-CLI
+    _log = CLI || opts.verbose ? console.log : ()=>{}; 
+
 
     /** 
      * The target url for the demo.
@@ -170,7 +175,7 @@ const gsModule = function(opts) {
         location = location || DEFAULT_LOC;
 
         const endpoint = 'capture';
-
+        _log("Capturing URL:", url," Location:", location.name);
         let reqBody = {
             'url': url,
             'viewport': '1336x1400',
@@ -201,9 +206,10 @@ const gsModule = function(opts) {
                     return reject(body.error);
                 }
 
-                //Add 
+                //Add metadata
                 body.location = location;
                 body.request = reqBody;
+                _log("Done Capturing URL:", url," Location:", location.name);
                 return resolve(body);
             });
         });
@@ -217,6 +223,7 @@ const gsModule = function(opts) {
      */
     function gsLocations() {
         const endpoint = 'locations';
+        _log("Retrieving all locations");
         let options = {
             method: 'GET',
             headers: {
@@ -229,34 +236,70 @@ const gsModule = function(opts) {
 
         return new Promise((resolve, reject) => {
             request(options, function(error, response, body) {
-                if (error) {
-                    return reject(error);
+                let result = {};
+                try {
+                    result = JSON.parse(body);
+                } catch (e) {
+                    throw "Error getting locations "+e;
                 }
-                return resolve(JSON.parse(body));
+                if (error || response.statusCode !== 200 || result.error) {
+                    return reject(result.error);
+                }
+                return resolve(result);
             });
         });
 
     }
-
+    
+    /**
+     * Select location that match country_code
+     * @function
+     * @param {string} listLocs - The list of locations.
+     * @param {string} country_code - Alpha2 Country Code, defaults to US
+     * @returns {Function} Returns a function that returns a promise
+     */
+    function helperFilterByCountry(country_code) 
+    {
+        country_code = (typeof country_code === "string") ? country_code.trim().toUpperCase() : "US";
+        return function (listLocs) {
+            return Promise.resolve(listLocs.filter((loc)=>{
+                return loc.country_code === country_code;
+            }));
+        };
+    }
+    
     /**
      * Issues multiple capture requests
      * @function
      * @param {string} listLocs - The list of locations.
-     * @param {string} allDone - The callback function.
+     * @param {Function} allDone - The callback function for async (optional)
+     * @returns {Promise} Returns a promise
      */
     function gsMultiCapture(listLocs, allDone) {
+        _log("Capturing ",listLocs.length);
         // Default to initial url
         let url = URL;
-
-        async.eachLimit(listLocs, API_LIMIT, (location, singleDone) => {
-            gsCapture(url, location)
-                .then(gsProcess)
-                .then((res) => {
-                    singleDone(null, res);
-                });
-        }, (err, allLocs) => {
-            if (err) console.error("gsMultiCapture", err);
-            allDone(null, allLocs);
+        return new Promise((resolve, reject) => {
+            async.eachLimit(listLocs, API_LIMIT, (location, singleDone) => {
+                gsCapture(url, location)
+                    .then(gsProcess)
+                    .then((res) => {
+                        singleDone(null, res);
+                    });
+            }, (err, allLocs) => {
+                if (err) {
+                    reject(err);
+                    console.error("gsMultiCapture", err);
+                }
+                else
+                {
+                    resolve(allLocs);
+                }
+                if (allDone) {
+                    allDone(null, allLocs);
+                }
+            });
+            
         });
     }
 
@@ -301,18 +344,17 @@ const gsModule = function(opts) {
         capture: gsCapture,
         locations: gsLocations,
         process: gsProcess,
+        filter: helperFilterByCountry,
         multicapture: gsMultiCapture
-    }
+    };
 
 
-}
+};
 
 if (CLI) {
     _log("CLI Mode");
-
     
     const args = process.argv.slice(2);
-
 
     var test = args[0] || "single";
     var url = args[1] || null;
@@ -327,7 +369,7 @@ if (CLI) {
             // Capture random 5 locations
             _log("CLI", "Capturing 5 Random locations");
             let filterRandom = function(allLocs) {
-                return Promise.resolve(gs.utils.sample(allLocs, 5))
+                return Promise.resolve(gs.utils.sample(allLocs, 5));
             };
 
             gs.locations().then(filterRandom)

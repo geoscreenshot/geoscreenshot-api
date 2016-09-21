@@ -1,7 +1,13 @@
 # GeoScreenshot API Example
 
-This is an example for the early release GS API Alpha.
+This is an example for the early release GS API Beta.
 It captures Yahoo Weather Pages from several locations.
+
+## Installation
+Requires Node.JS > 4.5 
+```bash
+npm install geoscreenshot-api;
+```
 
 ## Usage
 
@@ -26,7 +32,7 @@ const config = {
     'verbose': true
 };
 
-const gs = require('./geoscreenshot')(config);
+const gs = require('geoscreenshot-api')(config);
 
 gs.locations()
     .then(gs.filter('IN')) // Filter by country code
@@ -51,7 +57,7 @@ const config = {
 'url': 'http://www.example.com',
 'imageDir': './out/'
 };
-const gs = require('./geoscreenshot')(config);
+const gs = require('geoscreenshot-api')(config);
 gs.gsCapture('http://www.example.com').then((result) => {
     console.log("Retrieved base 64 image of length: ", result.image.length);
 }, (error) => {
@@ -72,7 +78,7 @@ const config = {
     'verbose': true
 };
 
-const gs = require('./geoscreenshot')(config);
+const gs = require('geoscreenshot-api')(config);
 
 gs.locations().then(gs.multicapture)
     .then((results) => {

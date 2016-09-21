@@ -237,13 +237,18 @@ const gsModule = function(opts) {
         return new Promise((resolve, reject) => {
             request(options, function(error, response, body) {
                 let result = {};
-                try {
-                    result = JSON.parse(body);
-                } catch (e) {
-                    throw "Error getting locations "+e;
-                }
+                let statusCode = response.statusCode;
+
                 if (error || response.statusCode !== 200 || result.error) {
-                    return reject(result.error);
+                    return reject(statusCode, result.error);
+                }
+                else
+                {
+                    try {
+                        result = JSON.parse(body);
+                    } catch (e) {
+                        throw "Error getting locations " + statusCode;
+                    }
                 }
                 return resolve(result);
             });

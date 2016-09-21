@@ -1,7 +1,7 @@
 {
-  "name": "geoscreenshot-api-example",
-  "version": "0.1.0",
-  "description": "Example for consuming basic operations of the GeoScreenshot web capture API. The example makes calls to the capture web service to retrieve capture data and stores the image as a PNG file. The simple use case captures Yahoo Weather for all available plus locations.",
+  "name": "geoscreenshot-api",
+  "version": "0.1.1",
+  "description": "Capture a URL from multiple geo locations worldwide",
   "main": "geoscreenshot.js",
   "dependencies": {
     "async": "^0.2.10",
@@ -16,7 +16,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/geoscreenshot/geoscreenshot-api-example.git"
+    "url": "git+https://github.com/geoscreenshot/geoscreenshot-api"
   },
   "keywords": [
     "geoip",
@@ -28,10 +28,13 @@
     "web",
     "testing"
   ],
+    "engines": {
+      "node": ">=4.5"
+    },
   "author": "TE Web Solutions",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/geoscreenshot/geoscreenshot-api-example/issues"
+    "url": "https://github.com/geoscreenshot/geoscreenshot-api/issues"
   },
-  "homepage": "https://github.com/geoscreenshot/geoscreenshot-api-example#readme"
+  "homepage": "https://github.com/geoscreenshot/geoscreenshot-api#readme"
 }

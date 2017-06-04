@@ -134,7 +134,7 @@ const gsModule = function(opts) {
      * @constant {string} CRED_PASSWORD
      * @default testapi
      */
-    const CRED_PASSWORD = process.env.GS_PASSWORD || opts.username || false;
+    const CRED_PASSWORD = process.env.GS_PASSWORD || opts.password || false;
     
     if (!(CRED_USERNAME && CRED_PASSWORD))
     {
